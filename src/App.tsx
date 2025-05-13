@@ -61,7 +61,10 @@ function App() {
       </VKButton>
       </div>
     <div className="w-full flex flex-col justify-center items-center">
+      
+      <main className="App-main"> 
       {tab === "list" && 
+      <>
       <table className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md">
         <thead>
           <tr className="bg-gray-100 border-b border-gray-200">
@@ -123,10 +126,34 @@ function App() {
           </tr>
         </tbody>
       </table>
+          <VKButton size="md" rounded="lg" className="w-full my-8" onClick={() => setTab("add-person")}>
+            Add Person
+          </VKButton>
+      </>
       }
-      {tab === "add-person" && <h1 className="text-2xl font-bold"></h1>}
-      {tab === "form" && 
-      <main className="App-main"> 
+      {tab === "add-person" && 
+        <>
+          <form className="w-full">
+          <VKInput type='text' id='username' variant="outline" hasError={errors.username} errorMessage={errors?.username?.message} {...register("username")}  rounded="xl" label="Username"/>
+          <VKInput label="age" type="number" id="age"  hasError={errors.age} errorMessage={errors?.age?.message} {...register("age",{valueAsNumber: true})} rounded="xl" variant="outline"/>
+          <VKInput label="email" type="email" id="email"  hasError={errors.email} errorMessage={errors?.email?.message} {...register("email")} rounded="xl" variant="outline"/>
+
+          <label htmlFor="gender">Gender</label>
+          <select id="gender" {...register("gender")}>
+            <option value="" disabled selected hidden>Select gender</option>
+            <option value = "male">Male</option>
+            <option value = "female">Female</option>
+            <option value = "others">Others</option>
+          </select>
+
+          <VKButton type='submit' size="md" rounded="md">
+            Add
+          </VKButton>
+
+          </form>
+        </>
+      }
+      {tab === "form" && <>
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <VKInput type='text' id='username' variant="outline" hasError={errors.username} errorMessage={errors?.username?.message} {...register("username")}  rounded="xl" label="Username"/>
           <VKInput type="password" id="password" variant="outline" hasError={errors.password} errorMessage={errors?.password?.message} {...register("password")} rounded="xl" label="Password"/>
@@ -157,8 +184,9 @@ function App() {
           </VKButton>
         </form>
         <DevTool control={control}/>
-      </main>
+      </>
       }
+      </main>
     </div>
     </VKLayout>
   );
