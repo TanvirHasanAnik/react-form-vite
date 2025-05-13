@@ -28,10 +28,17 @@ const addFormSchema = z.object({
 
 type formValues = z.infer<typeof formSchema>;
 type addFormValues = z.infer<typeof addFormSchema>;
+type Person = {
+  id: number,
+  username: string,
+  age: number,
+  email: string,
+  gender: string
+}
 
 function App() {
   const [tab, setTab] = useState("list");
-  const [personList, setPersonList] = useState([]);
+  const [personList, setPersonList] = useState<Person>([]);
   const personId = useRef(0);
 
   const form = useForm<formValues>({resolver: zodResolver(formSchema), mode: "onBlur"});
@@ -96,7 +103,7 @@ function App() {
       </div>
     <div className="w-full flex flex-col justify-center items-center">
       
-      <main className="App-main"> 
+      <main className="App-main w-full"> 
       {tab === "list" && 
       <>
       <table className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md">
@@ -110,7 +117,7 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {personList.map((person)=>{
+          {personList.map((person: Person)=>{
             return <>
             <tr key={person.id} className="bg-gray-50 border-b border-gray-200">
               <td>{person.username}</td>
@@ -148,22 +155,28 @@ function App() {
       {tab === "add-person" && 
         <>
           <form onSubmit={addHandleSubmit(onAddSubmit)} className="w-full">
-          <VKInput type='text' id='username' variant="outline" hasError={addErrors.username} errorMessage={addErrors?.username?.message} {...addRegister("username")}  rounded="xl" label="Username"/>
-          <VKInput label="age" type="number" id="age"  hasError={addErrors.age} errorMessage={addErrors?.age?.message} {...addRegister("age",{valueAsNumber: true})} rounded="xl" variant="outline"/>
-          <VKInput label="email" type="email" id="email"  hasError={addErrors.email} errorMessage={addErrors?.email?.message} {...addRegister("email")} rounded="xl" variant="outline"/>
-
-          <label htmlFor="gender">Gender</label>
-          <select id="gender" {...addRegister("gender")}>
-            <option value="" disabled selected hidden>Select gender</option>
-            <option value = "male">Male</option>
-            <option value = "female">Female</option>
-            <option value = "others">Others</option>
-          </select>
-          {addErrors.gender && <p style={{ color: 'red' }}>{addErrors.gender.message}</p>}
-
-          <VKButton type='submit' size="md" rounded="md">
-            Add
-          </VKButton>
+            <div className="flex flex-col items-start bg-primary-foreground rounded-xl p-5 gap-4 w-full">
+              <div className="add_person_inputs w-full grid grid-cols-2 gap-4">
+                <VKInput label="Username" type='text' id='username' variant="outline" hasError={addErrors.username} errorMessage={addErrors?.username?.message} {...addRegister("username")}  rounded="md" />
+                <VKInput label="Age" type="number" id="age"  hasError={addErrors.age} errorMessage={addErrors?.age?.message} {...addRegister("age",{valueAsNumber: true})} rounded="md" variant="outline"/>
+                <VKInput label="E-mail" type="email" id="email"  hasError={addErrors.email} errorMessage={addErrors?.email?.message} {...addRegister("email")} rounded="md" variant="outline"/>
+                <div>
+                  <label htmlFor="gender">Gender</label>
+                  <select id="gender" {...addRegister("gender")}>
+                    <option value="" disabled selected hidden>Select gender</option>
+                    <option value = "male">Male</option>
+                    <option value = "female">Female</option>
+                    <option value = "others">Others</option>
+                  </select>
+                  {addErrors.gender && <p style={{ color: 'red' }}>{addErrors.gender.message}</p>}
+                </div>
+              </div>
+              <div className="">
+                <VKButton type='submit' size="md" rounded="md">
+                  Add person
+                </VKButton>
+              </div>
+            </div>
           </form>
         </>
       }
