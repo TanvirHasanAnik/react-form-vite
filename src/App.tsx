@@ -1,9 +1,9 @@
+import { DevTool } from "@hookform/devtools";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { VKButton, VKCheckbox, VKInput, VKLayout } from "@vivakits/react-components";
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import './App.css';
-import {z} from 'zod'
-import {useForm} from 'react-hook-form'
-import {DevTool} from "@hookform/devtools"
-import {zodResolver} from '@hookform/resolvers/zod';
-import { VKButton,VKCheckbox,VKInput } from "@vivakits/react-components";
 
 
 
@@ -45,11 +45,23 @@ function App() {
    console.log('rendered')
    console.log(errors)
   return (
-    <div className="App w-full">
+    <VKLayout orientation="horizontal">
+      <div className="w-60 bg-blue-100 text-center text-white flex flex-col justify-start items-center gap-4 p-4">
+      <VKButton size="md" rounded="lg" className="w-full">
+        List
+      </VKButton>
+      <VKButton size="md" rounded="lg" className="w-full">
+        Add Person
+      </VKButton>
+      <VKButton size="md" rounded="lg" className="w-full">
+        Form
+      </VKButton>
+      </div>
+    <div className="forms w-full flex flex-col justify-center items-center">
       <header className="App-header">
       </header>
-      <main>
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <main className="App-main"> 
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <VKInput type='text' id='username' variant="outline" hasError={errors.username} errorMessage={errors?.username?.message} {...register("username")}  rounded="xl" label="Username"/>
           <VKInput type="password" id="password" variant="outline" hasError={errors.password} errorMessage={errors?.password?.message} {...register("password")} rounded="xl" label="Password"/>
           <VKInput label="age" type="number" id="age"  hasError={errors.age} errorMessage={errors?.age?.message} {...register("age",{valueAsNumber: true})} rounded="xl" variant="outline"/>
@@ -58,7 +70,7 @@ function App() {
           {errors.isStudent && <p style={{ color: 'red' }}>{errors.isStudent.message}</p>}
 
           <label htmlFor="gender">Gender</label>
-          <select id="gender" {...register("gender")} ge>
+          <select id="gender" {...register("gender")}>
             <option value="" disabled selected hidden>Select gender</option>
             <option value = "male">Male</option>
             <option value = "female">Female</option>
@@ -75,12 +87,13 @@ function App() {
           {errors.time && <p style={{ color: 'red' }}>{errors.time.message}</p>}
 
           <VKButton type='submit' size="md" rounded="md">
-            Medium
+            Submit
           </VKButton>
         </form>
         <DevTool control={control}/>
       </main>
     </div>
+    </VKLayout>
   );
 }
 
