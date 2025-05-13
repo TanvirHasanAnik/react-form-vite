@@ -1,8 +1,8 @@
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from '@hookform/resolvers/zod';
-import { VKButton, VKCheckbox, VKGroup, VKInput, VKLayout } from "@vivakits/react-components";
-import { useRef,useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { VKButton, VKCheckbox, VKGroup, VKInput,VKSelect, VKLayout } from "@vivakits/react-components";
+import { useEffect,useRef,useState } from 'react';
+import { useForm,Controller } from 'react-hook-form';
 import { z } from 'zod';
 import './App.css';
 
@@ -17,13 +17,22 @@ const formSchema = z.object({
   time: z.string().nonempty("Please provide a time"),
 })
 
+const genderOptions = [
+    { label: 'Male', value: "0" },
+    { label: 'Female', value: "1" },
+    { label: 'Others', value: "2" }
+  ]
+
 
 
 const addFormSchema = z.object({
   username: z.string().nonempty("Username is required").min(3,"Username must be atleast 3 characters long").max(15, "username can't be more than 15 characters"),
   age: z.number({invalid_type_error: "Age is required",}).gt(18,"Must be adult").lt(150,"Give a realistic age"),
   email: z.string().nonempty("Email is required").email("invalid email"),
-  gender: z.preprocess(val => val === '' ? undefined : val, z.enum(["male", "female", "others"], { required_error: "Please select gender" })) as z.ZodType<"male" | "female" | "others">,
+  gender: z.object({
+    value:z.string().nullable(),
+    label:z.string().nullable()
+  }),
 })
 
 type formValues = z.infer<typeof formSchema>;
@@ -38,13 +47,13 @@ type Person = {
 
 function App() {
   const [tab, setTab] = useState("list");
-  const [personList, setPersonList] = useState<Person>([]);
+  const [personList, setPersonList] = useState<Person []>([]);
   const personId = useRef(0);
 
   const form = useForm<formValues>({resolver: zodResolver(formSchema), mode: "onBlur"});
   const addForm = useForm<addFormValues>({resolver: zodResolver(addFormSchema), mode: "onBlur"});
   const {register, control, handleSubmit, formState: { errors }} = form;
-  const {register: addRegister, handleSubmit: addHandleSubmit, formState: { errors: addErrors }} = addForm;
+  const {register: addRegister, control:addControl, watch, handleSubmit: addHandleSubmit, formState: { errors: addErrors }} = addForm;
 
   const onSubmit = function (data: formValues){
     console.log("form submitted",data);
@@ -72,11 +81,17 @@ function App() {
       username: data.username,
       age: data.age,
       email: data.email,
-      gender: data.gender,
+      gender: data.gender.label,
     }
     setPersonList([...personList,newPerson])
     setTab("list")
   }
+
+  const genderValue = watch("gender");
+
+  useEffect(() => {
+    console.log("Live gender value:", genderValue);
+  }, [genderValue]);
 
   
   function handleDelete(id) {
@@ -157,10 +172,26 @@ function App() {
           <form onSubmit={addHandleSubmit(onAddSubmit)} className="w-full">
             <div className="flex flex-col items-start bg-primary-foreground rounded-xl p-5 gap-4 w-full">
               <div className="add_person_inputs w-full grid grid-cols-2 gap-4">
-                <VKInput label="Username" type='text' id='username' variant="outline" hasError={addErrors.username} errorMessage={addErrors?.username?.message} {...addRegister("username")}  rounded="md" />
-                <VKInput label="Age" type="number" id="age"  hasError={addErrors.age} errorMessage={addErrors?.age?.message} {...addRegister("age",{valueAsNumber: true})} rounded="md" variant="outline"/>
-                <VKInput label="E-mail" type="email" id="email"  hasError={addErrors.email} errorMessage={addErrors?.email?.message} {...addRegister("email")} rounded="md" variant="outline"/>
-                <div>
+                <VKInput size="sm" label="Username" placeholder="Enter username" type='text' id='username' hasError={addErrors.username !== undefined} errorMessage={addErrors?.username?.message} {...addRegister("username")}  rounded="md" />
+                <VKInput size="sm" label="Age" placeholder="Enter age" type="number" id="age"  hasError={addErrors.age !== undefined} errorMessage={addErrors?.age?.message} {...addRegister("age",{valueAsNumber: true})} rounded="md"/>
+                <VKInput size="sm" label="E-mail" placeholder="Enter email" type="email" id="email"  hasError={addErrors.email !== undefined} errorMessage={addErrors?.email?.message} {...addRegister("email")} rounded="md"/>
+                
+                <Controller
+                  name="gender"
+                  control={addControl}
+                  render={({ field }) => (
+                    <VKSelect
+                      label="Gender"
+                      placeholder="Select Gender"
+                      rounded="sm"
+                      hasError={addErrors.gender !== undefined} errorMessage={addErrors?.gender?.message}
+                      options={genderOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                {/* <div>
                   <label htmlFor="gender">Gender</label>
                   <select id="gender" {...addRegister("gender")}>
                     <option value="" disabled selected hidden>Select gender</option>
@@ -169,7 +200,7 @@ function App() {
                     <option value = "others">Others</option>
                   </select>
                   {addErrors.gender && <p style={{ color: 'red' }}>{addErrors.gender.message}</p>}
-                </div>
+                </div> */}
               </div>
               <div className="">
                 <VKButton type='submit' size="md" rounded="md">
