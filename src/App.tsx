@@ -1,6 +1,6 @@
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from '@hookform/resolvers/zod';
-import { VKButton, VKCheckbox, VKGroup, VKInput,VKSelect, VKLayout } from "@vivakits/react-components";
+import { VKEmpty,VKButton, VKCheckbox, VKGroup, VKInput,VKSelect, VKLayout } from "@vivakits/react-components";
 import { useRef,useState } from 'react';
 import { useForm,Controller } from 'react-hook-form';
 import { z } from 'zod';
@@ -92,23 +92,25 @@ function App() {
   console.log(errors)
   console.log("person list",personList)
   return (
-    <VKLayout orientation="horizontal" className="h-screen">
-      <div className="w-60 bg-blue-100 rounded-lg text-center text-white flex flex-col justify-start items-center gap-4 p-4 ">
-        <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("list")}>
+    <VKLayout orientation="horizontal" className="h-screen" gap="md">
+      <div className="w-60 bg-accent-foreground rounded-lg text-white flex flex-col justify-start items-center gap-4 p-4 ">
+        <VKButton size="md" rounded="lg" className="w-full focus:outline-none" variant="light" onClick={() => setTab("list")}>
           List
         </VKButton>
-        <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("add-person")}>
+        <VKButton size="md" rounded="lg" className="w-full focus:outline-none" variant="light" onClick={() => setTab("add-person")}>
           Add Person
         </VKButton>
-        <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("form")}>
+        <VKButton size="md" rounded="lg" className="w-full focus:outline-none" variant="light" onClick={() => setTab("form")}>
           Form
         </VKButton>
       </div>
-    <div className="w-full flex flex-col justify-center items-center">
+    <div className="w-full flex flex-col items-center h-full">
       
-      <main className="App-main w-full"> 
-      {tab === "list" && 
+      <main className="App-main w-full flex flex-col p-8 bg-accent-foreground rounded-lg h-full"> 
+      {tab === "list" &&
       <>
+      {
+       personList.length > 0 ?
       <table className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md">
         <thead>
           <tr className="bg-gray-100 border-b border-gray-200">
@@ -149,10 +151,12 @@ function App() {
             </>
           })}
         </tbody>
-      </table>
-          <VKButton size="md" rounded="lg" className="w-full my-8" onClick={() => setTab("add-person")}>
-            Add Person
-          </VKButton>
+      </table> : 
+      <VKEmpty/>
+      }
+      <VKButton size="md" rounded="lg" className="w-full my-8" variant="outline" onClick={() => setTab("add-person")}>
+        Add Person
+      </VKButton>
       </>
       }
       {tab === "add-person" && 
@@ -172,7 +176,8 @@ function App() {
                       label="Gender"
                       placeholder="Select Gender"
                       rounded="sm"
-                      hasError={addErrors.gender !== undefined} errorMessage={addErrors?.gender?.message}
+                      hasError={addErrors.gender !== undefined} 
+                      errorMessage={addErrors?.gender?.message}
                       options={genderOptions}
                       value={field.value}
                       onChange={field.onChange}
@@ -181,7 +186,7 @@ function App() {
                 />
               </div>
               <div className="">
-                <VKButton type='submit' size="md" rounded="md">
+                <VKButton type='submit' size="md" rounded="md" variant="outline">
                   Add person
                 </VKButton>
               </div>
@@ -215,7 +220,7 @@ function App() {
           <input type="time" id="time" {...register("time")}/>
           {errors.time && <p style={{ color: 'red' }}>{errors.time.message}</p>}
 
-          <VKButton type='submit' size="md" rounded="md">
+          <VKButton type='submit' size="md" rounded="md" variant="outline">
             Submit
           </VKButton>
         </form>
