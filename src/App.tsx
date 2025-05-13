@@ -19,13 +19,25 @@ const formSchema = z.object({
   time: z.string().nonempty("Please provide a time"),
 })
 
+
+
+const addFormSchema = z.object({
+  username: z.string().nonempty("Username is required").min(3,"Username must be atleast 3 characters long").max(15, "username can't be more than 15 characters"),
+  age: z.number({invalid_type_error: "Age is required",}).gt(18,"Must be adult").lt(150,"Give a realistic age"),
+  email: z.string().nonempty("Email is required").email("invalid email"),
+  gender: z.preprocess(val => val === '' ? undefined : val, z.enum(["male", "female", "others"], { required_error: "Please select gender" })) as z.ZodType<"male" | "female" | "others">,
+})
+
 type formValues = z.infer<typeof formSchema>;
+type addFormValues = z.infer<typeof addFormSchema>;
 
 function App() {
-  const [tab, setTab] = useState("form");
+  const [tab, setTab] = useState("list");
 
   const form = useForm<formValues>({resolver: zodResolver(formSchema), mode: "onBlur"});
+  const addForm = useForm<addFormValues>({resolver: zodResolver(addFormSchema), mode: "onBlur"});
   const {register, control, handleSubmit, formState: { errors }} = form;
+  const {register: addRegister, handleSubmit: addHandleSubmit, formState: { errors: addErrors }} = addForm;
 
   const onSubmit = function (data: formValues){
     console.log("form submitted",data);
@@ -45,20 +57,24 @@ function App() {
       else console.log(error)
     }
   }
+
+  const onAddSubmit = function (data: addFormValues){
+    console.log("form submitted",data);
+  }
    console.log('rendered')
    console.log(errors)
   return (
     <VKLayout orientation="horizontal" className="h-screen">
-      <div className="w-60 bg-blue-100 text-center text-white flex flex-col justify-start items-center gap-4 p-4">
-      <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("list")}>
-        List
-      </VKButton>
-      <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("add-person")}>
-        Add Person
-      </VKButton>
-      <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("form")}>
-        Form
-      </VKButton>
+      <div className="w-60 bg-blue-100 rounded-lg text-center text-white flex flex-col justify-start items-center gap-4 p-4 ">
+        <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("list")}>
+          List
+        </VKButton>
+        <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("add-person")}>
+          Add Person
+        </VKButton>
+        <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("form")}>
+          Form
+        </VKButton>
       </div>
     <div className="w-full flex flex-col justify-center items-center">
       
@@ -133,23 +149,23 @@ function App() {
       }
       {tab === "add-person" && 
         <>
-          <form className="w-full">
-          <VKInput type='text' id='username' variant="outline" hasError={errors.username} errorMessage={errors?.username?.message} {...register("username")}  rounded="xl" label="Username"/>
-          <VKInput label="age" type="number" id="age"  hasError={errors.age} errorMessage={errors?.age?.message} {...register("age",{valueAsNumber: true})} rounded="xl" variant="outline"/>
-          <VKInput label="email" type="email" id="email"  hasError={errors.email} errorMessage={errors?.email?.message} {...register("email")} rounded="xl" variant="outline"/>
+          <form onSubmit={addHandleSubmit(onAddSubmit)} className="w-full">
+          <VKInput type='text' id='username' variant="outline" hasError={addErrors.username} errorMessage={addErrors?.username?.message} {...addRegister("username")}  rounded="xl" label="Username"/>
+          <VKInput label="age" type="number" id="age"  hasError={addErrors.age} errorMessage={addErrors?.age?.message} {...addRegister("age",{valueAsNumber: true})} rounded="xl" variant="outline"/>
+          <VKInput label="email" type="email" id="email"  hasError={addErrors.email} errorMessage={addErrors?.email?.message} {...addRegister("email")} rounded="xl" variant="outline"/>
 
           <label htmlFor="gender">Gender</label>
-          <select id="gender" {...register("gender")}>
+          <select id="gender" {...addRegister("gender")}>
             <option value="" disabled selected hidden>Select gender</option>
             <option value = "male">Male</option>
             <option value = "female">Female</option>
             <option value = "others">Others</option>
           </select>
+          {addErrors.gender && <p style={{ color: 'red' }}>{addErrors.gender.message}</p>}
 
           <VKButton type='submit' size="md" rounded="md">
             Add
           </VKButton>
-
           </form>
         </>
       }
