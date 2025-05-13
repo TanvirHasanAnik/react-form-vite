@@ -48,7 +48,7 @@ function App() {
    console.log('rendered')
    console.log(errors)
   return (
-    <VKLayout orientation="horizontal">
+    <VKLayout orientation="horizontal" className="h-screen">
       <div className="w-60 bg-blue-100 text-center text-white flex flex-col justify-start items-center gap-4 p-4">
       <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("list")}>
         List
