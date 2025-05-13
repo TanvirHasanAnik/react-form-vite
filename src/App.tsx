@@ -1,12 +1,10 @@
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VKButton, VKCheckbox, VKGroup, VKInput, VKLayout } from "@vivakits/react-components";
-import { useState } from 'react';
+import { useRef,useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import './App.css';
-
-
 
 const formSchema = z.object({
   username: z.string().nonempty("Username is required").min(3,"Username must be atleast 3 characters long").max(15, "username can't be more than 15 characters"),
@@ -33,6 +31,8 @@ type addFormValues = z.infer<typeof addFormSchema>;
 
 function App() {
   const [tab, setTab] = useState("list");
+  const [personList, setPersonList] = useState([]);
+  const personId = useRef(0);
 
   const form = useForm<formValues>({resolver: zodResolver(formSchema), mode: "onBlur"});
   const addForm = useForm<addFormValues>({resolver: zodResolver(addFormSchema), mode: "onBlur"});
@@ -60,9 +60,27 @@ function App() {
 
   const onAddSubmit = function (data: addFormValues){
     console.log("form submitted",data);
+    const newPerson = {
+      id: personId.current += 1,
+      username: data.username,
+      age: data.age,
+      email: data.email,
+      gender: data.gender,
+    }
+    setPersonList([...personList,newPerson])
+    setTab("list")
   }
-   console.log('rendered')
-   console.log(errors)
+
+  
+  function handleDelete(id) {
+    const newPersonList = personList.filter((person) => {
+      return person.id !== id
+    })
+    setPersonList(newPersonList)
+  }
+  console.log('rendered')
+  console.log(errors)
+  console.log("person list",personList)
   return (
     <VKLayout orientation="horizontal" className="h-screen">
       <div className="w-60 bg-blue-100 rounded-lg text-center text-white flex flex-col justify-start items-center gap-4 p-4 ">
@@ -92,54 +110,34 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          <tr className="bg-gray-50 border-b border-gray-200">
-            <td>Tanvir</td>
-            <td>25</td>
-            <td>asd@gmail.com</td>
-            <td>Male</td>
-            <td>
-            <div className="flex flex-wrap items-start gap-2 p-3">
-                  <VKGroup
-                    rounded={"sm"}
-                    childrenProps={
-                      {
-                        variant: "outline",
-                        className: "border-0",
+          {personList.map((person)=>{
+            return <>
+            <tr key={person.id} className="bg-gray-50 border-b border-gray-200">
+              <td>{person.username}</td>
+              <td>{person.age}</td>
+              <td>{person.email}</td>
+              <td>{person.gender}</td>
+              <td>
+              <div className="flex flex-wrap items-start gap-2 p-3">
+                    <VKGroup
+                      rounded={"sm"}
+                      childrenProps={
+                        {
+                          variant: "outline",
+                          className: "border-0",
+                        }
                       }
-                    }
-                    size="md"
-                  >
-                    <VKButton>View</VKButton>
-                    <VKButton>Delete</VKButton>
-                    <VKButton>Edit</VKButton>
-                  </VKGroup>
-            </div>
-            </td>
-          </tr>
-          <tr className="bg-gray-50 border-b border-gray-200">
-            <td className="p-3">Anik</td>
-            <td className="p-3">25</td>
-            <td className="p-3">asd@gmail.com</td>
-            <td className="p-3">Male</td>
-            <td>
-            <div className="flex flex-wrap items-start gap-2 p-3">
-                  <VKGroup
-                    rounded={"sm"}
-                    childrenProps={
-                      {
-                        variant: "outline",
-                        className: "border-0",
-                      }
-                    }
-                    size="md"
-                  >
-                    <VKButton>View</VKButton>
-                    <VKButton>Delete</VKButton>
-                    <VKButton>Edit</VKButton>
-                  </VKGroup>
-            </div>
-            </td>
-          </tr>
+                      size="md"
+                    >
+                      <VKButton>View</VKButton>
+                      <VKButton onClick={() => handleDelete(person.id)}>Delete</VKButton>
+                      <VKButton>Edit</VKButton>
+                    </VKGroup>
+              </div>
+              </td>
+            </tr>
+            </>
+          })}
         </tbody>
       </table>
           <VKButton size="md" rounded="lg" className="w-full my-8" onClick={() => setTab("add-person")}>
