@@ -1,6 +1,7 @@
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from '@hookform/resolvers/zod';
-import { VKButton, VKCheckbox, VKInput, VKLayout } from "@vivakits/react-components";
+import { VKButton, VKCheckbox, VKGroup, VKInput, VKLayout } from "@vivakits/react-components";
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import './App.css';
@@ -21,6 +22,8 @@ const formSchema = z.object({
 type formValues = z.infer<typeof formSchema>;
 
 function App() {
+  const [tab, setTab] = useState("form");
+
   const form = useForm<formValues>({resolver: zodResolver(formSchema), mode: "onBlur"});
   const {register, control, handleSubmit, formState: { errors }} = form;
 
@@ -47,19 +50,82 @@ function App() {
   return (
     <VKLayout orientation="horizontal">
       <div className="w-60 bg-blue-100 text-center text-white flex flex-col justify-start items-center gap-4 p-4">
-      <VKButton size="md" rounded="lg" className="w-full">
+      <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("list")}>
         List
       </VKButton>
-      <VKButton size="md" rounded="lg" className="w-full">
+      <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("add-person")}>
         Add Person
       </VKButton>
-      <VKButton size="md" rounded="lg" className="w-full">
+      <VKButton size="md" rounded="lg" className="w-full" onClick={() => setTab("form")}>
         Form
       </VKButton>
       </div>
-    <div className="forms w-full flex flex-col justify-center items-center">
-      <header className="App-header">
-      </header>
+    <div className="w-full flex flex-col justify-center items-center">
+      {tab === "list" && 
+      <table className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md">
+        <thead>
+          <tr className="bg-gray-100 border-b border-gray-200">
+            <th className="p-3">Username</th>
+            <th className="p-3">Age</th>
+            <th className="p-3">Email</th>
+            <th className="p-3">Gender</th>
+            <th className="p-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="bg-gray-50 border-b border-gray-200">
+            <td>Tanvir</td>
+            <td>25</td>
+            <td>asd@gmail.com</td>
+            <td>Male</td>
+            <td>
+            <div className="flex flex-wrap items-start gap-2 p-3">
+                  <VKGroup
+                    rounded={"sm"}
+                    childrenProps={
+                      {
+                        variant: "outline",
+                        className: "border-0",
+                      }
+                    }
+                    size="md"
+                  >
+                    <VKButton>View</VKButton>
+                    <VKButton>Delete</VKButton>
+                    <VKButton>Edit</VKButton>
+                  </VKGroup>
+            </div>
+            </td>
+          </tr>
+          <tr className="bg-gray-50 border-b border-gray-200">
+            <td className="p-3">Anik</td>
+            <td className="p-3">25</td>
+            <td className="p-3">asd@gmail.com</td>
+            <td className="p-3">Male</td>
+            <td>
+            <div className="flex flex-wrap items-start gap-2 p-3">
+                  <VKGroup
+                    rounded={"sm"}
+                    childrenProps={
+                      {
+                        variant: "outline",
+                        className: "border-0",
+                      }
+                    }
+                    size="md"
+                  >
+                    <VKButton>View</VKButton>
+                    <VKButton>Delete</VKButton>
+                    <VKButton>Edit</VKButton>
+                  </VKGroup>
+            </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      }
+      {tab === "add-person" && <h1 className="text-2xl font-bold"></h1>}
+      {tab === "form" && 
       <main className="App-main"> 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <VKInput type='text' id='username' variant="outline" hasError={errors.username} errorMessage={errors?.username?.message} {...register("username")}  rounded="xl" label="Username"/>
@@ -92,6 +158,7 @@ function App() {
         </form>
         <DevTool control={control}/>
       </main>
+      }
     </div>
     </VKLayout>
   );
