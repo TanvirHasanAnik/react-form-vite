@@ -120,11 +120,11 @@ function App() {
         <table className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md">
           <thead>
             <tr className="bg-gray-100 border-b border-gray-200">
-              <th className="p-3">Username</th>
-              <th className="p-3">Age</th>
-              <th className="p-3">Email</th>
-              <th className="p-3">Gender</th>
-              <th className="p-3">Action</th>
+              <th className="p-3 text-left">Username</th>
+              <th className="p-3 text-left">Age</th>
+              <th className="p-3 text-left">Email</th>
+              <th className="p-3 text-left">Gender</th>
+              <th className="p-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
