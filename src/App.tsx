@@ -79,6 +79,7 @@ function App() {
     }
     setPersonList([...personList,newPerson])
     setTab("list")
+    addForm.reset()
   }
 
   
@@ -124,7 +125,7 @@ function App() {
               <th className="p-3 text-left">Age</th>
               <th className="p-3 text-left">Email</th>
               <th className="p-3 text-left">Gender</th>
-              <th className="p-3 text-center">Action</th>
+              <th className="px-7 text-left">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -160,7 +161,7 @@ function App() {
         </table> : 
         <VKEmpty/>
         }
-        <VKButton size="md" rounded="lg" className="w-full my-8" variant="outline" onClick={() => setTab("add-person")}>
+        <VKButton size="md" rounded="lg" className="my-8 w-auto self-start" variant="outline" onClick={() => setTab("add-person")}>
           Add Person
         </VKButton>
         </>
